@@ -1,5 +1,6 @@
 import os
 import sys
+import traceback
 from collections import namedtuple
 from pathlib import Path
 import re
@@ -184,10 +185,12 @@ class InterrogateModels:
 
     def interrogate(self, pil_image):
         res = ""
-        shared.state.begin(job="interrogate")
+        shared.state.begin()
+        shared.state.job = 'interrogate'
         try:
-            lowvram.send_everything_to_cpu()
-            devices.torch_gc()
+            if shared.cmd_opts.lowvram or shared.cmd_opts.medvram:
+                lowvram.send_everything_to_cpu()
+                devices.torch_gc()
 
             self.load()
 
@@ -213,7 +216,8 @@ class InterrogateModels:
                             res += f", {match}"
 
         except Exception:
-            errors.report("Error interrogating", exc_info=True)
+            print("Error interrogating", file=sys.stderr)
+            print(traceback.format_exc(), file=sys.stderr)
             res += "<error>"
 
         self.unload()

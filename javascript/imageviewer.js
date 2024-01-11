@@ -33,11 +33,8 @@ function updateOnBackgroundChange() {
     const modalImage = gradioApp().getElementById("modalImage");
     if (modalImage && modalImage.offsetParent) {
         let currentButton = selected_gallery_button();
-        let preview = gradioApp().querySelectorAll('.livePreview > img');
-        if (opts.js_live_preview_in_modal_lightbox && preview.length > 0) {
-            // show preview image if available
-            modalImage.src = preview[preview.length - 1].src;
-        } else if (currentButton?.children?.length > 0 && modalImage.src != currentButton.children[0].src) {
+
+        if (currentButton?.children?.length > 0 && modalImage.src != currentButton.children[0].src) {
             modalImage.src = currentButton.children[0].src;
             if (modalImage.style.display === 'none') {
                 const modal = gradioApp().getElementById("lightboxModal");
@@ -139,11 +136,6 @@ function setupImageForLightbox(e) {
     var event = isFirefox ? 'mousedown' : 'click';
 
     e.addEventListener(event, function(evt) {
-        if (evt.button == 1) {
-            open(evt.target.src);
-            evt.preventDefault();
-            return;
-        }
         if (!opts.js_modal_lightbox || evt.button != 0) return;
 
         modalZoomSet(gradioApp().getElementById('modalImage'), opts.js_modal_lightbox_initially_zoomed);
@@ -178,7 +170,7 @@ function modalTileImageToggle(event) {
     event.stopPropagation();
 }
 
-onAfterUiUpdate(function() {
+onUiUpdate(function() {
     var fullImg_preview = gradioApp().querySelectorAll('.gradio-gallery > div > img');
     if (fullImg_preview != null) {
         fullImg_preview.forEach(setupImageForLightbox);

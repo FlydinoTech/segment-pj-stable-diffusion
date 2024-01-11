@@ -39,5 +39,5 @@ function imageMaskResize() {
     });
 }
 
-onAfterUiUpdate(imageMaskResize);
+onUiUpdate(imageMaskResize);
 window.addEventListener('resize', imageMaskResize);

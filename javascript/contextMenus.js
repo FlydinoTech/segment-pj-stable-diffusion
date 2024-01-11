@@ -148,18 +148,12 @@ var addContextMenuEventListener = initResponse[2];
         500);
     };
 
-    let generateOnRepeat_txt2img = function() {
+    appendContextMenuOption('#txt2img_generate', 'Generate forever', function() {
         generateOnRepeat('#txt2img_generate', '#txt2img_interrupt');
-    };
-
-    let generateOnRepeat_img2img = function() {
+    });
+    appendContextMenuOption('#img2img_generate', 'Generate forever', function() {
         generateOnRepeat('#img2img_generate', '#img2img_interrupt');
-    };
-
-    appendContextMenuOption('#txt2img_generate', 'Generate forever', generateOnRepeat_txt2img);
-    appendContextMenuOption('#txt2img_interrupt', 'Generate forever', generateOnRepeat_txt2img);
-    appendContextMenuOption('#img2img_generate', 'Generate forever', generateOnRepeat_img2img);
-    appendContextMenuOption('#img2img_interrupt', 'Generate forever', generateOnRepeat_img2img);
+    });
 
     let cancelGenerateForever = function() {
         clearInterval(window.generateOnRepeatInterval);
@@ -173,4 +167,6 @@ var addContextMenuEventListener = initResponse[2];
 })();
 //End example Context Menu Items
 
-onAfterUiUpdate(addContextMenuEventListener);
+onUiUpdate(function() {
+    addContextMenuEventListener();
+});

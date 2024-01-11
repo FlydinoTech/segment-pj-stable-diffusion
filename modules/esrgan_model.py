@@ -1,13 +1,15 @@
-import sys
+import os
 
 import numpy as np
 import torch
 from PIL import Image
+from basicsr.utils.download_util import load_file_from_url
 
 import modules.esrgan_model_arch as arch
 from modules import modelloader, images, devices
-from modules.shared import opts
 from modules.upscaler import Upscaler, UpscalerData
+from modules.shared import opts
+
 
 
 def mod2normal(state_dict):
@@ -132,7 +134,7 @@ class UpscalerESRGAN(Upscaler):
             scaler_data = UpscalerData(self.model_name, self.model_url, self, 4)
             scalers.append(scaler_data)
         for file in model_paths:
-            if file.startswith("http"):
+            if "http" in file:
                 name = self.model_name
             else:
                 name = modelloader.friendly_name(file)
@@ -141,25 +143,26 @@ class UpscalerESRGAN(Upscaler):
             self.scalers.append(scaler_data)
 
     def do_upscale(self, img, selected_model):
-        try:
-            model = self.load_model(selected_model)
-        except Exception as e:
-            print(f"Unable to load ESRGAN model {selected_model}: {e}", file=sys.stderr)
+        model = self.load_model(selected_model)
+        if model is None:
             return img
         model.to(devices.device_esrgan)
         img = esrgan_upscale(model, img)
         return img
 
     def load_model(self, path: str):
-        if path.startswith("http"):
-            # TODO: this doesn't use `path` at all?
-            filename = modelloader.load_file_from_url(
+        if "http" in path:
+            filename = load_file_from_url(
                 url=self.model_url,
                 model_dir=self.model_download_path,
                 file_name=f"{self.model_name}.pth",
+                progress=True,
             )
         else:
             filename = path
+        if not os.path.exists(filename) or filename is None:
+            print(f"Unable to load {self.model_path} from {filename}")
+            return None
 
         state_dict = torch.load(filename, map_location='cpu' if devices.device_esrgan.type == 'mps' else None)
 

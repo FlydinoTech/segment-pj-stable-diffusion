@@ -42,7 +42,7 @@ onOptionsChanged(function() {
 function settingsHintsShowQuicksettings() {
     requestGet("./internal/quicksettings-hint", {}, function(data) {
         var table = document.createElement('table');
-        table.className = 'popup-table';
+        table.className = 'settings-value-table';
 
         data.forEach(function(obj) {
             var tr = document.createElement('tr');
